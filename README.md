@@ -2,7 +2,7 @@
 Icinga2 with Gearman workers
 
 ## Purpose
-We have 3000+ hosts and 17000+ services in our Icinga2 installation. Most checks are executed once every 5 minutes, but we also have a lot of checks that needs to be executed more often - like every minute or less. Due to a bug in Icinga2 (_The Zone object 'worker' has more than two endpoints. Due to a known issue this type of configuration is strongly discouraged and may cause Icinga to use excessive amounts of CPU time._) we need to have more than two satellites, or workers as we call them.
+We have 3000+ hosts and 17000+ services in our Icinga2 installation. Most checks are executed once every 5 minutes, but we also have a lot of checks that needs to be executed more often - like every minute or less. Due to a bug in Icinga2 (_The Zone object 'worker' has more than two endpoints. Due to a known issue this type of configuration is strongly discouraged and may cause Icinga to use excessive amounts of CPU time._) we shouldn't use more than two satellites, or workers as we call them. But we have too many checks for two workers to handle, so we absolutely need to have more than two to make Icinga2 run.
 
 This scales really bad for two reasons. The obvious one is the bug described above. More than two workers (satellites) adds excessive CPU time. The other reason is that the Icinga2 cluster divides workloads *evenly* across all workers. If you have 4 workers with different hardware, your slowest server will have 25% of the total workload if you don't dedicate checks to specific servers (which is a bad idea in case that server has a problem).
 
