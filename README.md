@@ -30,6 +30,9 @@ This will add the check-job to the gearman job server queue. This script (gearma
 
 The Gearman workers will run the other script (icinga2_gearman_worker.sh) to join the two gearman worker queues, and they need to have the full range of check scripts in the /usr/lib/nagios/plugins directory. In theory you can add as many gearman workers as you want.
 
+## Status
+The project is up and running in our lab. There is not a whole lot of workload, but still everything works exactly as planned.
+
 ## TODO
 * Make background services from the icinga2_gearman_worker.sh script
 * Add more tuning and tweaking for workers (max number of jobs, etc)
