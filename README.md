@@ -14,4 +14,4 @@ So what I wanted to to, was to put gearman into play also for Icinga2.
 
 ## Quick and dirty howto
 
-![Image](PoC diagram.png "diagram")
+![Image](PoC_Diagram.png "diagram")
