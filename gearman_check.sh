@@ -23,7 +23,7 @@ port="4730"          # Gearman job server port name. Default is 4730
 func="test"          # The function or queue name
 command="$@"         # The full check command
 
-output=`gearman -h $host -p $port -f $func "${command}"`
+output=`$gearman -h $host -p $port -f $func "${command}"`
 
 gearman_exitstatus=$?
 
