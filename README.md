@@ -15,3 +15,20 @@ So what I wanted to to, was to put gearman into play also for Icinga2.
 ## Quick and dirty howto
 
 ![Image](PoC_Diagram.png "diagram")
+
+So what I want to do is to offload all the work from the Icinga2 workers (satellites), and move that workload down to gearman workers. I still want to have two Icinga2 workers for redundancy, but the only task these two servers have is to add jobs to the gearman job server and present the results back to the master Icinga2 server.
+
+The checks in icinga2 needs to be rewritten so that they start with "gearman_check.sh <original full check>". Example:
+    object CheckCommand "check_hostname_cpu" {
+      import "plugin-check-command"
+      command = PluginDir + "/gearman_check.sh check_snmp -C xxx -o cpmCPUTotal5minRev.2 -u % -w :70 -c :80 -l CPU_RSP0 -H hostname"
+
+This will add the check-job to the gearman job server queue. This script (gearman_check.sh) is the only check-script you need to have in the /usr/lib/nagios/plugins directory on the Icinga2 workers.
+
+The Gearman workers will run the other script (icinga2_gearman_worker.sh) to join the two gearman worker queues, and they need to have the full range of check scripts in the /usr/lib/nagios/plugins directory. In theory you can add as many gearman workers as you want.
+
+## TODO
+* Make background services from the icinga2_gearman_worker.sh script
+* Add more tuning and tweaking for workers (max number of jobs, etc)
+* Stress-test and see how everything is holding up
+* Use in production...?
