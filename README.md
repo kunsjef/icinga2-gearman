@@ -8,6 +8,11 @@ This scales really bad for two reasons. The obvious one is the bug described abo
 
 Additionally, there is a lot of problem when we need to reload the Icinga2 Master to refresh new configuration. We want to do this as often as possible to make sure we are up to date with all changes in the network, but every time we reload, the CPU and number of processes on all the workers spike and go bananas. This lasts for at least 10-15 minutes.
 
+We have had a lot of problems with Icinga2 and load:
+https://monitoring-portal.org/woltlab/index.php?thread/35860-load-balancing-in-icinga2/
+https://monitoring-portal.org/woltlab/index.php?thread/36096-why-would-we-need-icinga2/
+https://monitoring-portal.org/woltlab/index.php?thread/37113-load-balancing-trouble/
+
 I really liked the mod-gearman-tools for Icinga1 where all the satellites/workers ran gearman. You could add and remove workers as you saw fit, and the hardware config could be totally different. Each worker just does how much he _can_ of the workload.
 
 So what I wanted to to, was to put gearman into play also for Icinga2.
