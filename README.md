@@ -131,7 +131,7 @@ sed -i 's/command = \[ PluginDir + \"\//command = \[ PluginDir + \"\/gearman_cli
 ```
 
 ## Status
-After a lot of testing in our lab, we decided to put everything into production. As of January 2019 we have 2 satellites and 6 workers, and everything is running really smooth. We can reload the Icinga2 Master as often as we want. We can restart a worker without **any** impact of the other servers (other that a small, shared increase in load, which is expected). Our two satellites have 4 CPU cores and 8 GB of RAM, and the average load is around 1.3 with an average of 85 gearman jobs running.
+After a lot of testing in our lab, we decided to put everything into production. As of January 2019 we have 2 satellites and 6 workers, and everything is running really smooth. We can reload the Icinga2 Master as often as we want. We can restart a worker without **any** impact of the other servers (other that a small, shared increase in load, which is expected). Our two satellites have 4 CPU cores and 8 GB of RAM, and the average load is around 1.5 with an average of 60-70 gearman jobs running at all times.
 
 ```
 # gearman_top -H satellite1:4730
