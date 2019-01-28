@@ -6,6 +6,8 @@ We have 3000+ hosts and 17000+ services in our Icinga2 installation. Most checks
 
 This scales really bad for two reasons. The obvious one is the bug described above. More than two satellites adds excessive CPU time. The other reason is that the Icinga2 cluster divides workloads *evenly* across all satellites. If you have 4 satellites with different hardware, your slowest server will have 25% of the total workload if you don't dedicate checks to specific servers (which is a bad idea in case that server has a problem).
 
+Additionally, there is a lot of problem when we need to reload the Icinga2 Master to refresh new configuration. We want to do this as often as possible to make sure we are up to date with all changes in the network, but every time we reload, the CPU and number of processes on all the workers spike and go bananas. This lasts for at least 10-15 minutes.
+
 I really liked the mod-gearman-tools for Icinga1 where all the satellites/workers ran gearman. You could add and remove workers as you saw fit, and the hardware config could be totally different. Each worker just does how much he _can_ of the workload.
 
 So what I wanted to to, was to put gearman into play also for Icinga2.
@@ -125,17 +127,18 @@ object CheckCommand "check_hostname_cpu" {
 In addition, you have to change the checks that are included as plugins in Icinga2. These checks can be found in the file /usr/share/icinga2/include/command-plugins.conf. This can be done for all plugins using sed like this:
 
 ```
-
-In addition, you have to change the checks that are included as plugins in Icinga2. These checks can be found in the file /usr/share/icinga2/include/command-plugins.conf. This can be done for all plugins using sed like this:
 sed -i 's/command = \[ PluginDir + \"\//command = \[ PluginDir + \"\/gearman_client.sh /g' /usr/share/icinga2/include/command-plugins.conf
 ```
-In addition, you have to change the checks that are included as plugins in Icinga2. These checks can be found in the file /usr/share/icinga2/include/command-plugins.conf. This can be done for all plugins using sed like this:
 
 ## Status
-The project is up and running in our lab. There is not a whole lot of workload, but still everything works exactly as planned.
+After a lot of testing in our lab, we decided to put everything into production. As of January 2019 we have 2 satellites and 6 workers, and everything is running really smooth. We can reload the Icinga2 Master as often as we want. We can restart a worker without **any** impact of the other servers (other that a small, shared increase in load, which is expected). Our two satellites have 4 CPU cores and 8 GB of RAM, and the average load is around 1.3 with an average of 85 gearman jobs running.
 
-## TODO
-* Make background services from the icinga2_gearman_worker.sh script
-* Add more tuning and tweaking for workers (max number of jobs, etc)
-* Stress-test and see how everything is holding up
-* Use in production...?
+```
+# gearman_top -H satellite1:4730
+
+ Queue Name   | Worker Available | Jobs Waiting | Jobs Running
+---------------------------------------------------------------
+ icinga2      |             360  |           0  |          83
+---------------------------------------------------------------
+```
+
