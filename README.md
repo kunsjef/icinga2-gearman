@@ -142,3 +142,4 @@ After a lot of testing in our lab, we decided to put everything into production.
 ---------------------------------------------------------------
 ```
 
+So in conclusion we have two extra servers to handle, but we finally have a stable Icinga2 installation that runs smoothly without load and process spikes even if we reload every 30 minutes. Additionally we can add and remove workers as we wish, and we can easily use old servers with less hardware specs, and just tune the number of worker processes we run on them.
