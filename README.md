@@ -30,6 +30,8 @@ The purpose of gearman_check.sh is to add all the jobs from the Icinga2 Master t
 ### Workers
 The Gearman worker servers will need to have the full range of check scripts that you wish to use in your Icinga2 config. They will run multiple instances of the **icinga2_gearman_worker.sh** script. I have placed this script inside the home directory of the nagios user: /var/lib/nagios/, and chowned it to nagios.  Remember that this needs to be done for all your workers. We have 6, so Saltstack or similiar software is your friend.
 
+In addition they will need the gearman-tools package installed.
+
 Each gearman worker process will add 1 worker (thread) to the gearman job server queue. This means that the icinga2_gearman_worker.sh script needs to be started 10 times to add 10 workers to the queue. And this is just for the queue on one of the two satellites, I will need to start 10 more to get 10 workers on the queue on satellite 2. This is a lot of work to handle manually, so I needed to do this as systemd services that I can easily control and that will be automatically started when the server reboots.
 
 In /etc/systemd/system I created two files:
@@ -102,11 +104,14 @@ To check that your workers have joined the queue, you can use gearman_top:
 
 ```
 # gearman_top -H satellite1:4730
+
  Queue Name   | Worker Available | Jobs Waiting | Jobs Running
 ---------------------------------------------------------------
  icinga2      |              30  |           0  |           0
 ---------------------------------------------------------------
 ```
+
+This is a nice tool for monitoring the queues after you add all the workers and start adding real jobs.
 
 ### Checks
 The checks in icinga2 needs to be rewritten so that they start with "gearman_check.sh <original full check>". Example:
@@ -117,7 +122,14 @@ object CheckCommand "check_hostname_cpu" {
    command = PluginDir + "/gearman_check.sh check_snmp -C xxx -o cpmCPUTotal5minRev.2 -u % -w :70 -c :80 -l CPU_RSP0 -H hostname"
 ```
 
-The Gearman workers will run the other script (icinga2_gearman_worker.sh) to join the two gearman worker queues, and they need to have the full range of check scripts in the /usr/lib/nagios/plugins directory. In theory you can add as many gearman workers as you want.
+In addition, you have to change the checks that are included as plugins in Icinga2. These checks can be found in the file /usr/share/icinga2/include/command-plugins.conf. This can be done for all plugins using sed like this:
+
+```
+
+In addition, you have to change the checks that are included as plugins in Icinga2. These checks can be found in the file /usr/share/icinga2/include/command-plugins.conf. This can be done for all plugins using sed like this:
+sed -i 's/command = \[ PluginDir + \"\//command = \[ PluginDir + \"\/gearman_client.sh /g' /usr/share/icinga2/include/command-plugins.conf
+```
+In addition, you have to change the checks that are included as plugins in Icinga2. These checks can be found in the file /usr/share/icinga2/include/command-plugins.conf. This can be done for all plugins using sed like this:
 
 ## Status
 The project is up and running in our lab. There is not a whole lot of workload, but still everything works exactly as planned.
