@@ -135,7 +135,7 @@ In addition, you have to change the checks that are included as plugins in Icing
 sed -i 's/command = \[ PluginDir + \"\//command = \[ PluginDir + \"\/gearman_client.sh /g' /usr/share/icinga2/include/command-plugins.conf
 ```
 
-**Warning:** This solution may not last. Upgrades to Icinga2 may overwrite this file without notice. Take extreme care to watch this file for changes!
+<font color=red>**Warning:**</font> This solution may not last. Upgrades to Icinga2 may overwrite this file without notice. Take extreme care to watch this file for changes!
 
 ## Status
 After a lot of testing in our lab, we decided to put everything into production. As of January 2019 we have 2 satellites and 6 workers, and everything is running really smooth. We can reload the Icinga2 Master as often as we want. We can restart a worker without **any** impact of the other servers (other that a small, shared increase in load, which is expected). Our two satellites have 4 CPU cores and 8 GB of RAM, and the average load is around 1.5 with an average of 60-70 gearman jobs running at all times.
